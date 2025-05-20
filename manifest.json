@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Netflix Time Tracker Extension",
+  "version": "1.0",
+  "description": "Netflixの再生時間を画面上に表示する拡張機能",
+  "permissions": [],
+  "content_scripts": [
+    {
+      "matches": ["https://www.netflix.com/watch/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
