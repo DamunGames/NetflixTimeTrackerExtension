@@ -1,29 +1,57 @@
 // タイマーを追加する標的のclass
-const CLASS_TARGET_PARENT = "ltr-100d0a9";
-const CLASS_TARGET = "ltr-1npqywr";
+const BOTTOM_CONTROLS_PARENT = ".ltr-100d0a9";
+const BOTTOM_CONTROLS_PARENT_CACHE = ".default-ltr-iqcdef-cache-100d0a9";
+const TIMELINE_PARENT = ".ltr-1npqywr";
+const TIMELINE_PARENT_CACHE = ".default-ltr-iqcdef-cache-1npqywr";
 
 // styleを参照するclass
-const CLASS_REFLECTION = "ltr-lb3bic";
-const CLASS_REFLECTION_TEXT = "ltr-1qtcbde";
+const REFLECTION_TIMER_DIV = ".ltr-lb3bic";
+const REFLECTION_TIMER_DIV_CACHE = ".default-ltr-iqcdef-cache-lb3bic";
+const REFLECTION_TIMER_SPAN = ".ltr-1qtcbde";
+const REFLECTION_TIMER_SPAN_CACHE = ".default-ltr-iqcdef-cache-1qtcbde";
 
 // 追加する要素の名前
 const CUSTOM_TIMER_ID = "custom-timer";
 const CUSTOM_TIMER_TEXT_ID = "custom-timer-text";
 
+const devLog = (...args) => {
+  if (chrome.runtime.getManifest().env === 'dev') {
+    console.log(...args);
+  }
+};
+
+const devWarn = (...args) => {
+  if (chrome.runtime.getManifest().env === 'dev') {
+    console.warn(...args);
+  }
+};
+
+const querySelectorWithLog = (parent, selector, selector2) => {
+    const element = parent.querySelector(selector);
+    const element2 = parent.querySelector(selector2);
+    if (!element && !element2) {
+        devWarn(`${parent}: not found query ${selector} ${selector2}`);
+    }
+    if (element) return element;
+    return element2;
+}
+
 const createTimer = () => {
-    const controlsParentContainer = document.querySelector(`.${CLASS_TARGET_PARENT}`);
-    if (!controlsParentContainer) return;
-    const controlsContainer = controlsParentContainer.querySelector(`.${CLASS_TARGET}`);
-    if (!controlsContainer) return;
-    const controlsReflection = controlsParentContainer.querySelector(`.${CLASS_REFLECTION_TEXT}`);
-    if (!controlsReflection) return;
+    const bottomControlsParent = querySelectorWithLog(document, BOTTOM_CONTROLS_PARENT, BOTTOM_CONTROLS_PARENT_CACHE);
+    if (!bottomControlsParent) return;
+    const timelineParent = querySelectorWithLog(bottomControlsParent, TIMELINE_PARENT, TIMELINE_PARENT_CACHE);
+    if (!timelineParent) return;
+    const reflectionTimerDiv = querySelectorWithLog(bottomControlsParent, REFLECTION_TIMER_DIV, REFLECTION_TIMER_DIV_CACHE);
+    if (!reflectionTimerDiv) return;
+    const reflectionTimerSpan = querySelectorWithLog(reflectionTimerDiv, REFLECTION_TIMER_SPAN, REFLECTION_TIMER_SPAN_CACHE);
+    if (!reflectionTimerSpan) return;
 
     let timerDiv = document.createElement("div");
     timerDiv.id = CUSTOM_TIMER_ID;
-    timerDiv.className = CLASS_REFLECTION;    // 残り時間のstyleを流用
+    timerDiv.className = reflectionTimerDiv.className;    // 残り時間のstyleを流用
     timerDiv.style.alignItems = "center";
     timerDiv.style.justifyContent = "center";
-    controlsContainer.prepend(timerDiv);
+    timelineParent.prepend(timerDiv);
 
     // paddingを左右反転
     const computedStyle = window.getComputedStyle(timerDiv);
@@ -32,7 +60,7 @@ const createTimer = () => {
 
     let timerTextSpan = document.createElement("span");
     timerTextSpan.id = CUSTOM_TIMER_TEXT_ID;
-    timerTextSpan.className = CLASS_REFLECTION_TEXT;
+    timerTextSpan.className = reflectionTimerSpan.className;
     timerDiv.appendChild(timerTextSpan);
 };
 
@@ -55,8 +83,7 @@ const formatTime = (seconds) => {
 // 要素の監視（MutationObserver）
 const observeControls = () => {
     const observer = new MutationObserver(() => {
-        const controlsContainer = document.querySelector(`.${CLASS_TARGET_PARENT}`);
-        if (controlsContainer && !document.getElementById(CUSTOM_TIMER_ID)) {
+        if (querySelectorWithLog(document, BOTTOM_CONTROLS_PARENT, BOTTOM_CONTROLS_PARENT_CACHE) && !document.getElementById(CUSTOM_TIMER_ID)) {
             createTimer();
             updateTimer();
         }
