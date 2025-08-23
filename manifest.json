@@ -4,7 +4,17 @@
   "version": "1.1",
   "description": "Netflixの再生時間を画面上に表示する拡張機能",
   "env": "release",
-  "permissions": [],
+  "permissions": [
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://www.netflix.com/watch/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {},
   "content_scripts": [
     {
       "matches": ["https://www.netflix.com/watch/*"],
