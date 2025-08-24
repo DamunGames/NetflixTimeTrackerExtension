@@ -52,9 +52,10 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
             devLog('Netflixタブに戻ってきた');
             lastNetflixTabId = activeInfo.tabId;
             activateTab(lastNetflixTabId);
-        } else {
+        } else if (lastNetflixTabId) {
             devLog('Netflix以外のタブに移動した');
-            inactivatedTab(lastNetflixTabId)
+            inactivatedTab(lastNetflixTabId);
+            lastNetflixTabId = null;
         }
     });
 });

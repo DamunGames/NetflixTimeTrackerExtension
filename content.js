@@ -66,6 +66,15 @@ else {
         timerDiv.style.paddingRight = computedStyle.paddingLeft;
         timerDiv.style.paddingLeft = "0";
 
+        chrome.storage.local.get('ntt.timeDisplay.useRatio', (data) => {
+            if (data['ntt.timeDisplay.useRatio'] ?? false) {
+                // 再生時間/動画時間の表示サイズに調整
+                timerDiv.style.width = "14rem";
+                // 残り時間の非表示
+                reflectionTimerDiv.remove();
+            }
+        });
+
         let timerTextSpan = document.createElement("span");
         timerTextSpan.id = CUSTOM_TIMER_TEXT_ID;
         timerTextSpan.className = reflectionTimerSpan.className;
@@ -78,7 +87,15 @@ else {
 
         if (!video || !timerTextSpan) return;
 
-        timerTextSpan.innerText = `${formatTime(video.currentTime)}`;
+        chrome.storage.local.get('ntt.timeDisplay.useRatio', (data) => {
+            // 再生時間 or 再生時間/動画時間 の表示
+            if (data['ntt.timeDisplay.useRatio'] ?? false) {
+                timerTextSpan.innerText = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+            }
+            else {
+                timerTextSpan.innerText = `${formatTime(video.currentTime)}`;
+            }
+        });
     };
 
     // 分:秒 形式に変換
